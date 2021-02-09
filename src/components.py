@@ -19,7 +19,10 @@ def dominant_set(A, x = None, epsilon = 1e-4):
     return x
 
 def is_neighbor(p, q, epsilon, metric):
-    return get_pair_distance(p, q, metric) > epsilon
+    if metric == 'euclidean':
+        return get_pair_distance(p, q, metric) < epsilon
+    elif metric == 'cosine':
+        return get_pair_distance(p, q, metric) > epsilon
 def region_query(x, point_id, epsilon, metric):
     return [i for i in range(x.shape[0]) if is_neighbor(x[point_id], x[i], epsilon, metric) and point_id != i]
 def expand_cluster(x, point_id, epsilon, min_points, metric):
