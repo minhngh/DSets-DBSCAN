@@ -18,12 +18,12 @@ def dominant_set(A, x = None, epsilon = 1e-4):
         dist = np.linalg.norm(x - x_old)
     return x
 
-def is_neighbor(p, q, epsilon):
-    return get_pair_distance(p, q) < epsilon
-def region_query(x, point_id, epsilon):
-    return [i for i in range(x.shape[0]) if is_neighbor(x[point_id], x[i], epsilon) and point_id != i]
-def expand_cluster(x, point_id, epsilon, min_points):
-    seeds = region_query(x, point_id, epsilon)
+def is_neighbor(p, q, epsilon, metric):
+    return get_pair_distance(p, q, metric) > epsilon
+def region_query(x, point_id, epsilon, metric):
+    return [i for i in range(x.shape[0]) if is_neighbor(x[point_id], x[i], epsilon, metric) and point_id != i]
+def expand_cluster(x, point_id, epsilon, min_points, metric):
+    seeds = region_query(x, point_id, epsilon, metric)
     if len(seeds) < min_points:
         return []
     explored = [0] * x.shape[0]
@@ -33,7 +33,7 @@ def expand_cluster(x, point_id, epsilon, min_points):
     result.extend(seeds)
     while seeds:
         current_point = seeds[0]
-        neighbors = region_query(x, current_point, epsilon)
+        neighbors = region_query(x, current_point, epsilon, metric)
         if len(neighbors) >= min_points:
             for neighbor in neighbors:
                 if explored[neighbor] == 0:
@@ -42,4 +42,3 @@ def expand_cluster(x, point_id, epsilon, min_points):
                     explored[neighbor] = 1
         seeds = seeds[1:]
     return result
-

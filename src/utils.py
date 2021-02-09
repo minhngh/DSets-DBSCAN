@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import pairwise_distances
+from sklearn.metrics.pairwise import cosine_similarity
 from contextlib import contextmanager
 from time import time
 
@@ -11,12 +12,18 @@ def timer():
     end = time()
     print(f'Elapsed time: {end - start} s')
 
-def get_pair_distance(a, b):
-    return np.sqrt(np.sum((a[:-1] - b[:-1])**2))
+def get_pair_distance(a, b, metric = 'euclidean'):
+    if metric == 'euclidean':
+        return np.sqrt(np.sum((a[:-1] - b[:-1])**2))
+    elif metric == 'cosine':
+        return np.sum(a[:-1] * b[:-1]) / (np.linalg.norm(a[:-1]) * np.linalg.norm(b[:-1]))
 
 def get_distances(X, metric = 'euclidean'):
     X = X[:, :-1]
-    return pairwise_distances(X, metric = metric)
+    if metric == 'euclidean':
+        return pairwise_distances(X, metric = metric)
+    elif metric == 'cosine':
+        return cosine_similarity(X)
 
 def get_similarity(x, distance_fn = pairwise_distances):
     x = x[:, :-1]
